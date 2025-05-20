@@ -2,8 +2,9 @@ package proj.controllers;
 
 import proj.interfaces.NotificationService;
 import proj.entities.Notification;
+import proj.dtos.ApiResponse;
+import proj.dtos.ApiResponseBasic;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -18,35 +19,37 @@ public class NotificationController {
     }
 
     @PostMapping
-    public ResponseEntity<Notification> createNotification(@RequestBody NotificationRequest request) {
+    public ApiResponse<Notification> createNotification(@RequestBody NotificationRequest request) {
         Notification notification = notificationService.createNotification(
             request.getMessage(),
             request.getType(),
             request.getUserId()
         );
-        return ResponseEntity.ok(notification);
+        return new ApiResponse<>(notification, "Notification created successfully", "00");
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Notification>> getUserNotifications(@PathVariable Long userId) {
-        return ResponseEntity.ok(notificationService.getUserNotifications(userId));
+    public ApiResponse<List<Notification>> getUserNotifications(@PathVariable Long userId) {
+        List<Notification> notifications = notificationService.getUserNotifications(userId);
+        return new ApiResponse<>(notifications, "Notifications retrieved successfully", "00");
     }
 
     @GetMapping("/user/{userId}/unread")
-    public ResponseEntity<List<Notification>> getUnreadNotifications(@PathVariable Long userId) {
-        return ResponseEntity.ok(notificationService.getUnreadNotifications(userId));
+    public ApiResponse<List<Notification>> getUnreadNotifications(@PathVariable Long userId) {
+        List<Notification> notifications = notificationService.getUnreadNotifications(userId);
+        return new ApiResponse<>(notifications, "Unread notifications retrieved successfully", "00");
     }
 
     @PutMapping("/{id}/read")
-    public ResponseEntity<Void> markAsRead(@PathVariable Long id) {
+    public ApiResponseBasic markAsRead(@PathVariable Long id) {
         notificationService.markAsRead(id);
-        return ResponseEntity.ok().build();
+        return new ApiResponseBasic("Notification marked as read", "00");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNotification(@PathVariable Long id) {
+    public ApiResponseBasic deleteNotification(@PathVariable Long id) {
         notificationService.deleteNotification(id);
-        return ResponseEntity.ok().build();
+        return new ApiResponseBasic("Notification deleted successfully", "00");
     }
 
     // Request DTO

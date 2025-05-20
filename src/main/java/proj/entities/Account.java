@@ -2,6 +2,7 @@ package proj.entities;
 
 import jakarta.persistence.*;
 import proj.enums.AccountType;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -85,5 +86,6 @@ public class Account {
     @ManyToOne
     private Customer customer;
     @OneToMany(mappedBy = "account")
+    @JsonManagedReference
     private List<Transaction> transactions;
 }

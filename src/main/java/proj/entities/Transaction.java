@@ -2,6 +2,8 @@ package proj.entities;
 
 import jakarta.persistence.*;
 import proj.enums.TransactionType;
+import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 public class Transaction {
@@ -10,6 +12,14 @@ public class Transaction {
     private Long id;
     private TransactionType type;
     private String description;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 
     public Transaction() {
     }
@@ -52,6 +62,15 @@ public class Transaction {
         this.account = account;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     @ManyToOne
+    @JsonBackReference
     private Account account;
 }
