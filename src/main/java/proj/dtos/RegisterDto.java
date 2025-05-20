@@ -1,8 +1,6 @@
 package proj.dtos;
 
-import proj.entities.Account;
 import proj.enums.AccountType;
-import proj.enums.TransactionType;
 
 public class RegisterDto {
     public String firstName;

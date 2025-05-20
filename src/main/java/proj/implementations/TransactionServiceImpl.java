@@ -8,6 +8,7 @@ import proj.entities.Account;
 import proj.entities.Transaction;
 import proj.enums.TransactionType;
 import proj.interfaces.AccountDao;
+import proj.interfaces.NotificationService;
 import proj.interfaces.TransactionDao;
 import proj.interfaces.TransactionService;
 
@@ -20,17 +21,26 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionDao transactionDao;
     @Autowired
     private AccountDao accountDao;
+    @Autowired
+    private NotificationService notificationService;
 
     public ApiResponseBasic deposit(DepositDto request){
         Optional<Account> accountOpt = accountDao.findById(request.accountId);
         if(accountOpt.isEmpty()) return new ApiResponseBasic("Account not found", "99");
-        ;
+        
         Account account = accountOpt.get();
         if(account.getCustomer().getId() != request.userId)  return new ApiResponseBasic("Something went wrong", "99");
         account.setBalance(account.getBalance() + request.amount);
 
         Transaction transaction = new Transaction(TransactionType.CREDIT, "Customer Deposit", account);
         transactionDao.save(transaction);
+        
+        // Send notification
+        notificationService.notifyTransaction(
+            request.userId,
+            String.format("Deposit of $%.2f was successful to account %s", request.amount, account.getNumber())
+        );
+        
         return new ApiResponseBasic("Success", "00");
     }
 
@@ -45,6 +55,13 @@ public class TransactionServiceImpl implements TransactionService {
 
         Transaction transaction = new Transaction(TransactionType.DEBIT, "Customer Withdrawal", account);
         transactionDao.save(transaction);
+        
+        // Send notification
+        notificationService.notifyTransaction(
+            request.userId,
+            String.format("Withdrawal of $%.2f was successful from account %s", request.amount, account.getNumber())
+        );
+        
         return new ApiResponseBasic("Success", "00");
     }
 
@@ -66,6 +83,17 @@ public class TransactionServiceImpl implements TransactionService {
         transactionDao.save(transaction1);
         Transaction transaction2 = new Transaction(TransactionType.CREDIT, "Transfer In", recipient);
         transactionDao.save(transaction2);
+
+        // Send notifications to both sender and recipient
+        notificationService.notifyTransaction(
+            request.userId,
+            String.format("Transfer of $%.2f was successful to account %s", request.amount, request.recipient)
+        );
+        
+        notificationService.notifyTransaction(
+            recipient.getCustomer().getId(),
+            String.format("Received transfer of $%.2f from account %s", request.amount, account.getNumber())
+        );
 
         return new ApiResponseBasic("Success", "00");
     }

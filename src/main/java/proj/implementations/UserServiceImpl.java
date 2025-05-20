@@ -18,11 +18,16 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private AccountService accountService;
 
-    public ApiResponse<Customer> register(RegisterDto request){
+    @Override
+    public ApiResponse<Customer> register(RegisterDto request) {
         Customer customer = new Customer(request.firstName, request.lastName, request.email, request.password);
         customer = userDao.save(customer);
         accountService.addAccount(customer, request.accountType);
+        return new ApiResponse<>(customer, "User registered successfully", "200");
+    }
 
-        return new ApiResponse<>(customer, "Success", "00");
+    @Override
+    public Customer getUserById(Long id) {
+        return userDao.findById(id).orElse(null);
     }
 }

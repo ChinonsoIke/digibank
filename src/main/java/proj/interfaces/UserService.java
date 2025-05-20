@@ -6,4 +6,5 @@ import proj.entities.Customer;
 
 public interface UserService {
     ApiResponse<Customer> register(RegisterDto request);
+    Customer getUserById(Long id);
 }
