@@ -5,16 +5,22 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-public class Customer {
+@Table(name = "users")
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String firstName;
     private String lastName;
     private String email;
+    private boolean isAdmin;
 
     public String getFirstName() {
         return firstName;
+    }
+
+    public boolean getIsAdmin(){
+        return isAdmin;
     }
 
     public void setFirstName(String firstName) {
@@ -55,12 +61,12 @@ public class Customer {
         this.id = id;
     }
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "user")
     private List<Account> accounts;
 
-    public Customer(){}
+    public User(){}
 
-    public Customer(String firstName, String lastName, String email, String password){
+    public User(String firstName, String lastName, String email, String password){
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

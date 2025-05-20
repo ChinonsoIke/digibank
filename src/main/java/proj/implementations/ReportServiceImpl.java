@@ -2,6 +2,7 @@ package proj.implementations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import proj.dtos.ApiResponse;
@@ -18,6 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class ReportServiceImpl implements ReportService {
     private final ReportDao reportDao;
     private final TransactionDao transactionDao;
@@ -81,7 +83,7 @@ public class ReportServiceImpl implements ReportService {
 
             Report report = new Report();
             report.setType("ACCOUNT_STATEMENT");
-            report.setUserId(account.getCustomer().getId());
+            report.setUserId(account.getUser().getId());
             report.setContent(objectMapper.writeValueAsString(statement));
             report = reportDao.save(report);
 
@@ -95,7 +97,7 @@ public class ReportServiceImpl implements ReportService {
     public ApiResponse<Report> generateUserActivity(Long userId, LocalDateTime startDate, LocalDateTime endDate) {
         try {
             List<Account> userAccounts = accountDao.findAll().stream()
-                .filter(a -> a.getCustomer().getId().equals(userId))
+                .filter(a -> a.getUser().getId().equals(userId))
                 .collect(Collectors.toList());
 
             List<Transaction> allTransactions = new ArrayList<>();

@@ -29,10 +29,10 @@ public class TransactionServiceImpl implements TransactionService {
         if(accountOpt.isEmpty()) return new ApiResponseBasic("Account not found", "99");
         
         Account account = accountOpt.get();
-        if(account.getCustomer().getId() != request.userId)  return new ApiResponseBasic("Something went wrong", "99");
+        if(account.getUser().getId() != request.userId)  return new ApiResponseBasic("Something went wrong", "99");
         account.setBalance(account.getBalance() + request.amount);
 
-        Transaction transaction = new Transaction(TransactionType.CREDIT, "Customer Deposit", account);
+        Transaction transaction = new Transaction(TransactionType.CREDIT, "User Deposit", account);
         transactionDao.save(transaction);
         
         // Send notification
@@ -49,11 +49,11 @@ public class TransactionServiceImpl implements TransactionService {
         if(accountOpt.isEmpty()) return new ApiResponseBasic("Account not found", "99");
         Account account = accountOpt.get();
 
-        if(account.getCustomer().getId() != request.userId)  return new ApiResponseBasic("Something went wrong", "99");
+        if(account.getUser().getId() != request.userId)  return new ApiResponseBasic("Something went wrong", "99");
         if(account.getBalance() < request.amount) return new ApiResponseBasic("Insufficient funds", "99");
         account.setBalance(account.getBalance() - request.amount);
 
-        Transaction transaction = new Transaction(TransactionType.DEBIT, "Customer Withdrawal", account);
+        Transaction transaction = new Transaction(TransactionType.DEBIT, "User Withdrawal", account);
         transactionDao.save(transaction);
         
         // Send notification
@@ -70,7 +70,7 @@ public class TransactionServiceImpl implements TransactionService {
         if(accountOpt.isEmpty()) return new ApiResponseBasic("Account not found", "99");
         Account account = accountOpt.get();
 
-        if(account.getCustomer().getId() != request.userId)  return new ApiResponseBasic("Something went wrong", "99");
+        if(account.getUser().getId() != request.userId)  return new ApiResponseBasic("Something went wrong", "99");
         if(account.getBalance() < request.amount) return new ApiResponseBasic("Insufficient funds", "99");
 
         Account recipient = accountDao.findByNumber(request.recipient);
@@ -91,7 +91,7 @@ public class TransactionServiceImpl implements TransactionService {
         );
         
         notificationService.notifyTransaction(
-            recipient.getCustomer().getId(),
+            recipient.getUser().getId(),
             String.format("Received transfer of $%.2f from account %s", request.amount, account.getNumber())
         );
 

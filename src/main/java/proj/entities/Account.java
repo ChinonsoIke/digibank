@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
+@Table(name = "accounts")
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,11 +23,11 @@ public class Account {
 
     public Account(){}
 
-    public Account(String number, AccountType type, LocalDate createdDate, Customer customer) {
+    public Account(String number, AccountType type, LocalDate createdDate, User user) {
         this.number = number;
         this.type = type;
         this.createdDate = createdDate;
-        this.customer = customer;
+        this.user = user;
     }
 
     public void setCreatedDate(LocalDate createdDate) {
@@ -65,12 +66,12 @@ public class Account {
         this.balance = balance;
     }
 
-    public Customer getCustomer() {
-        return customer;
+    public User getUser() {
+        return user;
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public List<Transaction> getTransactions() {
@@ -84,7 +85,7 @@ public class Account {
     private LocalDate createdDate;
 
     @ManyToOne
-    private Customer customer;
+    private User user;
     @OneToMany(mappedBy = "account")
     @JsonManagedReference
     private List<Transaction> transactions;

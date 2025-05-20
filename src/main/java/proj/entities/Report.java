@@ -20,6 +20,7 @@ public class Report {
     private LocalDateTime generatedAt;
 
     @Lob
+    @Column(columnDefinition = "TEXT")
     private String content;  // JSON string containing report data
 
     @PrePersist
