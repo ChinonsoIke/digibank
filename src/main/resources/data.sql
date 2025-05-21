@@ -1,7 +1,8 @@
--- Insert a customer
-INSERT INTO customer (id, first_name, last_name, email, password) VALUES (1, 'John', 'Doe', 'john.doe@example.com', 'password');
+-- Insert a user
+INSERT INTO users (id, first_name, last_name, email, password, is_admin) VALUES (1, 'John', 'Doe', 'john.doe@example.com', 'password', false);
+INSERT INTO users (id, first_name, last_name, email, password, is_admin) VALUES (2, 'Mod', 'Rator', 'm.r@example.com', 'password');
 
--- Insert an account for the customer
+-- Insert an account for the user
 INSERT INTO account (id, number, type, balance, created_date, customer_id) VALUES (1, '1234567890', 0, 1000.00, '2024-01-01', 1);
 
 -- Insert transactions for the account

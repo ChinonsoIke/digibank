@@ -2,9 +2,10 @@ package proj.interfaces;
 
 import proj.dtos.ApiResponse;
 import proj.dtos.RegisterDto;
-import proj.entities.Customer;
+import proj.entities.User;
 
 public interface UserService {
-    ApiResponse<Customer> register(RegisterDto request);
-    Customer getUserById(Long id);
+    ApiResponse<User> register(RegisterDto request);
+    User getUserById(Long id);
+    User getUserByEmail(String email);
 }
