@@ -14,6 +14,16 @@ public class Transaction {
     private TransactionType type;
     private String description;
 
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    private double amount;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -25,10 +35,11 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction(TransactionType type, String description, Account account) {
+    public Transaction(TransactionType type, String description, Account account, double amount) {
         this.type = type;
         this.description = description;
         this.account = account;
+        this.amount = amount;
     }
 
     public Long getId() {

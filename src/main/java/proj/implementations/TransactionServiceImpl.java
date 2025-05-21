@@ -2,7 +2,9 @@ package proj.implementations;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import proj.dtos.*;
 import proj.entities.Account;
 import proj.entities.Transaction;
@@ -12,6 +14,7 @@ import proj.interfaces.NotificationService;
 import proj.interfaces.TransactionDao;
 import proj.interfaces.TransactionService;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,6 +26,8 @@ public class TransactionServiceImpl implements TransactionService {
     private AccountDao accountDao;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private RestTemplate restTemplate;
 
     public ApiResponseBasic deposit(DepositDto request){
         Optional<Account> accountOpt = accountDao.findById(request.accountId);
@@ -32,7 +37,7 @@ public class TransactionServiceImpl implements TransactionService {
         if(account.getUser().getId() != request.userId)  return new ApiResponseBasic("Something went wrong", "99");
         account.setBalance(account.getBalance() + request.amount);
 
-        Transaction transaction = new Transaction(TransactionType.CREDIT, "User Deposit", account);
+        Transaction transaction = new Transaction(TransactionType.CREDIT, "User Deposit", account, request.amount);
         transactionDao.save(transaction);
         
         // Send notification
@@ -53,7 +58,7 @@ public class TransactionServiceImpl implements TransactionService {
         if(account.getBalance() < request.amount) return new ApiResponseBasic("Insufficient funds", "99");
         account.setBalance(account.getBalance() - request.amount);
 
-        Transaction transaction = new Transaction(TransactionType.DEBIT, "User Withdrawal", account);
+        Transaction transaction = new Transaction(TransactionType.DEBIT, "User Withdrawal", account, request.amount);
         transactionDao.save(transaction);
         
         // Send notification
@@ -79,9 +84,9 @@ public class TransactionServiceImpl implements TransactionService {
         account.setBalance(account.getBalance() - request.amount);
         recipient.setBalance(recipient.getBalance() + request.amount);
 
-        Transaction transaction1 = new Transaction(TransactionType.DEBIT, "Transfer Out", account);
+        Transaction transaction1 = new Transaction(TransactionType.DEBIT, "Transfer Out", account, request.amount);
         transactionDao.save(transaction1);
-        Transaction transaction2 = new Transaction(TransactionType.CREDIT, "Transfer In", recipient);
+        Transaction transaction2 = new Transaction(TransactionType.CREDIT, "Transfer In", recipient, request.amount);
         transactionDao.save(transaction2);
 
         // Send notifications to both sender and recipient
@@ -96,5 +101,11 @@ public class TransactionServiceImpl implements TransactionService {
         );
 
         return new ApiResponseBasic("Success", "00");
+    }
+
+    public ApiResponse<String> analyzeSpending(Long userId){
+        List<Transaction> transactions = transactionDao.getUserTransactions(userId);
+        ResponseEntity<String> response = restTemplate.postForEntity("http://localhost:8081/ai/analyze", transactions, String.class);
+        return new ApiResponse<>(response.getBody(), "success", "00");
     }
 }

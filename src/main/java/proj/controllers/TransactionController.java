@@ -3,13 +3,11 @@ package proj.controllers;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import proj.dtos.ApiResponseBasic;
-import proj.dtos.DepositDto;
-import proj.dtos.TransferDto;
-import proj.dtos.WithdrawDto;
+import proj.dtos.*;
 import proj.interfaces.TransactionService;
 import proj.utils.JwtService;
 import io.jsonwebtoken.Claims;
@@ -55,5 +53,11 @@ public class TransactionController {
         Claims claims = validateAndGetClaims();
         request.userId = Long.parseLong(claims.getSubject());
         return transactionService.transfer(request);
+    }
+
+    @GetMapping("/transactions/analyze")
+    public ApiResponse<String> analyzeSpending(){
+        Claims claims = validateAndGetClaims();
+        return transactionService.analyzeSpending(Long.parseLong(claims.getSubject()));
     }
 }
