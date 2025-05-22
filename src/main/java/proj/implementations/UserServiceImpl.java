@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import proj.dtos.ApiResponse;
+import proj.dtos.ApiResponseBasic;
 import proj.dtos.RegisterDto;
 import proj.entities.User;
 import proj.interfaces.AccountService;
@@ -22,11 +23,12 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder pEncoder;
 
     @Override
-    public ApiResponse<User> register(RegisterDto request) {
+    public ApiResponseBasic register(RegisterDto request) {
+        if(!request.password.equals(request.confirmPassword)) return new ApiResponseBasic("Passwords do not match", "99");
         User user = new User(request.firstName, request.lastName, request.email, pEncoder.encode(request.password));
         user = userDao.save(user);
         accountService.addAccount(user, request.accountType);
-        return new ApiResponse<>(user, "User registered successfully", "200");
+        return new ApiResponseBasic("User registered successfully", "200");
     }
 
     @Override
