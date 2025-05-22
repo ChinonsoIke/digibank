@@ -1,6 +1,7 @@
 package proj.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,9 +9,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import proj.dtos.*;
+import proj.entities.Transaction;
 import proj.interfaces.TransactionService;
 import proj.utils.JwtService;
 import io.jsonwebtoken.Claims;
+
+import java.util.List;
 
 @RestController
 public class TransactionController {
@@ -35,21 +39,21 @@ public class TransactionController {
     }
 
     @PostMapping("/transactions/deposit")
-    public ApiResponseBasic deposit(@RequestBody DepositDto request) {
+    public ApiResponseBasic deposit(@RequestBody @Valid DepositDto request) {
         Claims claims = validateAndGetClaims();
         request.userId = Long.parseLong(claims.getSubject());
         return transactionService.deposit(request);
     }
 
     @PostMapping("/transactions/withdraw")
-    public ApiResponseBasic withdraw(@RequestBody WithdrawDto request) {
+    public ApiResponseBasic withdraw(@RequestBody @Valid WithdrawDto request) {
         Claims claims = validateAndGetClaims();
         request.userId = Long.parseLong(claims.getSubject());
         return transactionService.withdraw(request);
     }
 
     @PostMapping("/transactions/transfer")
-    public ApiResponseBasic transfer(@RequestBody TransferDto request) {
+    public ApiResponseBasic transfer(@RequestBody @Valid TransferDto request) {
         Claims claims = validateAndGetClaims();
         request.userId = Long.parseLong(claims.getSubject());
         return transactionService.transfer(request);
@@ -59,5 +63,11 @@ public class TransactionController {
     public ApiResponse<String> analyzeSpending(){
         Claims claims = validateAndGetClaims();
         return transactionService.analyzeSpending(Long.parseLong(claims.getSubject()));
+    }
+
+    @GetMapping("/transactions/history")
+    public ApiResponse<List<Transaction>> history(){
+        Claims claims = validateAndGetClaims();
+        return transactionService.history(Long.parseLong(claims.getSubject()));
     }
 }

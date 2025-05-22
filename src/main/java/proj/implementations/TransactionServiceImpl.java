@@ -108,4 +108,9 @@ public class TransactionServiceImpl implements TransactionService {
         ResponseEntity<String> response = restTemplate.postForEntity("http://localhost:8081/ai/analyze", transactions, String.class);
         return new ApiResponse<>(response.getBody(), "success", "00");
     }
+
+    public ApiResponse<List<Transaction>> history(Long userId){
+        List<Transaction> transactions = transactionDao.getUserTransactions(userId);
+        return new ApiResponse<>(transactions, "success", "00");
+    }
 }
